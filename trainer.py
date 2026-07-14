@@ -38,6 +38,7 @@ class Trainer:
                 self.optimizer.zero_grad()
                 output = self.model(input)
                 loss = self.criterion(output, target)
+                
                 loss.backward()
                 self.optimizer.step()
                 train_loss += loss.item()
