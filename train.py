@@ -35,7 +35,6 @@ def saveConfigs():
         json.dump(configs, f, indent = 4)
 
 criterion = loss_fn()
-
 train_dataset = SampleDataset(configs["data_dir"], "train")
 val_dataset = SampleDataset(configs["data_dir"], "val")
 
