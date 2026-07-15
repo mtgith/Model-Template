@@ -27,8 +27,6 @@ configs = {
     "es_thresh": 1e-4,
     "scheduler_patience": 5,
     "scheduler_factor": 0.5,
-    "scheduler_patience": 5,
-    "shuffle": True,
     "drop_last": False,
 }
 
@@ -38,22 +36,22 @@ def saveConfigs():
 
 criterion = loss_fn()
 
+train_dataset = SampleDataset(configs["data_dir"], "train")
+val_dataset = SampleDataset(configs["data_dir"], "val")
+
 def createDataset(batch_size):
-    train_dataset = SampleDataset(configs["data_dir"], "train")
     train_loader = DataLoader(
         dataset = train_dataset,
         num_workers = configs["num_workers"],
         batch_size = batch_size,
-        shuffle = configs["shuffle"],
+        shuffle = True,
         drop_last = configs["drop_last"]
     )
 
-    val_dataset = SampleDataset(configs["data_dir"], "val")
     val_loader = DataLoader(
         dataset = val_dataset,
         num_workers = configs["num_workers"],
         batch_size = batch_size,
-        shuffle = configs["shuffle"],
         drop_last = configs["drop_last"]
     )
     return train_loader, val_loader
@@ -78,7 +76,7 @@ def objective(trial):
     hidden_size = trial.suggest_int("hidden_size", 32, 256, step = 32)
     dropout = trial.suggest_float("dropout", 0.1, 0.5)
     lr = trial.suggest_float("lr", 1e-5, 1e-2, log = True)
-    weight_decay = trial.suggest_int("weight_decay", 1e-4, 1e-1, log = True)
+    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-1, log = True)
     batch_size = trial.suggest_categorical("batch_size", [32, 64, 128])
     scheduler_factor = trial.suggest_float("scheduler_factor", 0.2, 0.7)
     scheduler_patience = trial.suggest_int("scheduler_patience", 5, 10)
@@ -99,7 +97,7 @@ def objective(trial):
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, 
         mode = 'min', 
-        min_lr = configs["min_lr"],      
+        min_lr = trial_configs["min_lr"],      
         factor = trial_configs["scheduler_factor"],        
         patience = trial_configs["scheduler_patience"],         
         threshold = trial_configs["es_thresh"]
@@ -113,7 +111,7 @@ if MODE == "optuna":
         direction = "minimize",
         pruner = optuna.pruners.MedianPruner(
             n_startup_trials = 5,
-            n_warmup_steps = 10
+            n_warmup_steps = 20
         )
     )
     study.optimize(objective, n_trials = 50)
@@ -122,7 +120,8 @@ if MODE == "optuna":
     print("\nBest parameters:")
     for key, value in study.best_params.items():
         print(key, value)
-        configs[key] = value
+    configs.update(study.best_params)
+    train()                           # Train with best parameters
 else:
     train()
 
