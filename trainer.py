@@ -1,3 +1,4 @@
+import optuna
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -19,7 +20,7 @@ class Trainer:
         model_save_path = Path(configs["model_dir"]) / configs["model_name"]
         self.early_stopper = es.EarlyStopping(patience, min_delta, model_save_path)
 
-    def train(self):
+    def train(self, trial = None):
         """
         To freeze a model for fixed feature extraction do this:
         for p in pretrained_model.parameters():
@@ -55,9 +56,13 @@ class Trainer:
 
             self.scheduler.step(val_loss)
             current_lr = self.optimizer.param_groups[0]["lr"]
-
             print(f"Epoch: {epoch} | Train Loss: {train_loss} | Val Loss: {val_loss} | LR: {current_lr}")
             
+            if trial is not None:
+                trial.report(val_loss, epoch)
+                if trial.should_prune():
+                    raise optuna.TrialPruned()
+                
             self.early_stopper(val_loss, self.model)
             if self.early_stopper.stopping:
                 print(f"Early Stopping at epoch {epoch} / {self.num_epochs}")
