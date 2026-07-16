@@ -10,14 +10,18 @@ class Trainer:
     def __init__(self, model: nn.Module, configs: dict, train_loader: DataLoader, val_loader: DataLoader, criterion: nn, optimizer: optim, scheduler: optim):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = model.to(self.device)
+
         self.train_loader = train_loader
         self.val_loader = val_loader
+
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.criterion = criterion
+
         self.num_epochs = configs["num_epochs"]
         min_delta = configs["es_thresh"]
         patience = configs["es_patience"]
+        
         model_save_path = Path(configs["model_dir"]) / configs["model_name"]
         self.early_stopper = es.EarlyStopping(patience, min_delta, model_save_path)
 
