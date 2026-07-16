@@ -74,16 +74,16 @@ def objective(trial):
     trial_configs = configs.copy()
     hidden_size = trial.suggest_int("hidden_size", 32, 256, step = 32)
     dropout = trial.suggest_float("dropout", 0.1, 0.5)
-    lr = trial.suggest_float("lr", 1e-5, 1e-2, log = True)
-    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-1, log = True)
+    lr = trial.suggest_float("lr", 1e-5, 1e-3, log = True)
+    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-2, log = True)
     batch_size = trial.suggest_categorical("batch_size", [32, 64, 128])
     scheduler_factor = trial.suggest_float("scheduler_factor", 0.2, 0.7)
     scheduler_patience = trial.suggest_int("scheduler_patience", 5, 10)
 
     trial_configs.update({
+        "lr": lr,
         "hidden_size": hidden_size,
         "dropout": dropout,
-        "lr": lr,
         "weight_decay": weight_decay,
         "batch_size": batch_size,
         "scheduler_factor": scheduler_factor,

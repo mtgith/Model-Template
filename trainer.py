@@ -8,7 +8,8 @@ import earlystopper as es
 
 class Trainer:
     def __init__(self, model: nn.Module, configs: dict, train_loader: DataLoader, val_loader: DataLoader, criterion: nn, optimizer: optim, scheduler: optim):
-        self.model = model
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = model.to(self.device)
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.optimizer = optimizer
@@ -36,6 +37,9 @@ class Trainer:
             self.model.train()
             train_loss = 0
             for input, target in self.train_loader:
+                input = input.to(self.device)
+                target = target.to(self.device)
+
                 self.optimizer.zero_grad()
                 output = self.model(input)
                 loss = self.criterion(output, target)
@@ -49,6 +53,9 @@ class Trainer:
             val_loss = 0
             with torch.no_grad():
                 for input, target in self.val_loader:
+                    input = input.to(self.device)
+                    target = target.to(self.device)
+
                     output = self.model(input)
                     loss = self.criterion(output, target)
                     val_loss += loss.item()
