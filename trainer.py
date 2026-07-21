@@ -55,7 +55,7 @@ class Trainer:
 
             self.model.eval()
             val_loss = 0
-            with torch.no_grad():
+            with torch.inference_mode():
                 for input, target in self.val_loader:
                     input = input.to(self.device)
                     target = target.to(self.device)
