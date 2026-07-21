@@ -29,7 +29,7 @@ def evalModel():
     for input, target in test_loader:
         input = input.to(device)
         target = target.to(device)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(input)
             loss = criterion(output, target)
             test_loss += loss.item()
