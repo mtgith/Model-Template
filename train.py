@@ -129,8 +129,8 @@ if MODE == "optuna":
     for key, value in study.best_params.items():
         print(key, value)
     configs.update(study.best_params)
-    train(configs, None)  # Train with best parameters
+    train(configs)  # Train with best parameters
 else:
-    train(configs, None)
+    train(configs)
 
 saveConfigs()
