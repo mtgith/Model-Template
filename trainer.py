@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import optuna
 import torch
-import torch.nn as nn
-import torch.optim as optim
+from torch import nn, optim
 from torch.utils.data import DataLoader
-from pathlib import Path
+
 import earlystopper as es
 
 

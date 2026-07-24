@@ -1,12 +1,13 @@
 import json
-import optuna
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
 from pathlib import Path
-from trainer import Trainer
-from model import Model
+
+import optuna
+from torch import optim
+from torch.utils.data import DataLoader
+
 from dataset import SampleDataset
+from model import Model
+from trainer import Trainer
 
 MODE = "optuna"
 configs = {

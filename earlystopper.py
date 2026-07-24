@@ -1,13 +1,15 @@
-import torch
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import torch
+
 
 class EarlyStopping:
     def __init__(self, patience: int, min_delta: float, path: Path):
         self.patience = patience
         self.min_delta = min_delta
         self.path = path
-        
+
         self.best_loss = np.inf
         self.counter = 0
         self.stopping = False
@@ -18,6 +20,6 @@ class EarlyStopping:
             self.counter = 0
             torch.save(model.state_dict(), self.path)
         else:
-            self.counter += 1 
+            self.counter += 1
             if self.counter >= self.patience:
                 self.stopping = True
